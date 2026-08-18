@@ -1,0 +1,27 @@
+# Dev-only conveniences: hot reload for backend/frontend and local psql access.
+# Loaded automatically by `docker compose up` alongside docker-compose.yml — no extra
+# flags needed for dev. Prod runs explicitly without this file (see docker-compose.prod.yml).
+services:
+  postgres:
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+
+  backend:
+    volumes:
+      - ./backend/app:/app/app:ro
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+
+  frontend:
+    build:
+      context: ./frontend
+      target: build
+    # Bypasses the nginx-based prod image entirely in favor of Vite's own dev server (HMR).
+    # Only specific paths are mounted (not the whole ./frontend dir) so the image's installed
+    # node_modules isn't shadowed by a host directory that doesn't have them.
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/index.html:/app/index.html
+      - ./frontend/vite.config.js:/app/vite.config.js
+    command: ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "5173"]
+    ports:
+      - "5173:5173"

@@ -1,0 +1,40 @@
+# Prod overrides: resource limits. No DB/Redis/backend/frontend host port exposure to
+# remove here — the base docker-compose.yml never publishes them; only docker-compose.
+# override.yml (dev-only, not used in prod) adds those back for local convenience.
+#
+# Usage: docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d
+services:
+  postgres:
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+
+  redis:
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+
+  backend:
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+
+  frontend:
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 128M
+
+  proxy:
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 128M
